@@ -1,0 +1,4672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiveCast Pro - Professional Live Streaming</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --dark: #111827;
+            --dark-light: #1f2937;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --border: #374151;
+            --broadcaster: #dc2626;
+            --viewer: #3b82f6;
+            --voice-active: #8b5cf6;
+            --screen-share: #8b5cf6;
+            --recording: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Auth Pages */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), transparent);
+            top: -100px;
+            right: -100px;
+            opacity: 0.1;
+        }
+
+        .auth-container::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--voice-active), transparent);
+            bottom: -100px;
+            left: -100px;
+            opacity: 0.1;
+        }
+
+        .auth-box {
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .auth-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--voice-active));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
+        }
+
+        .auth-header p {
+            color: var(--gray);
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 24px;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .auth-tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+
+        .auth-form {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--light);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group.checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group.checkbox label {
+            margin: 0;
+            font-size: 14px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .checkbox-input {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 2px solid var(--border);
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .checkbox-input.checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox-input.checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #0d966c);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-voice {
+            background: linear-gradient(135deg, var(--voice-active), #7c3aed);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-voice:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-screen {
+            background: linear-gradient(135deg, var(--screen-share), #7c3aed);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-screen:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--light);
+            border: 2px solid var(--border);
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid transparent;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-left-color: var(--success);
+            color: #10b981;
+        }
+
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-left-color: var(--danger);
+            color: #ef4444;
+        }
+
+        /* Main App */
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1f37 100%);
+        }
+
+        .navbar {
+            background-color: rgba(31, 41, 55, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 24px;
+            color: var(--light);
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo i {
+            color: var(--primary);
+            font-size: 28px;
+            filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3));
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 10px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .user-badge:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .user-role {
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .broadcaster-role {
+            background: linear-gradient(135deg, var(--broadcaster), #b91c1c);
+            color: white;
+        }
+
+        .viewer-role {
+            background: linear-gradient(135deg, var(--viewer), #1d4ed8);
+            color: white;
+        }
+
+        .live-badge {
+            background: linear-gradient(135deg, var(--danger), #b91c1c);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .screen-share-badge {
+            background: linear-gradient(135deg, var(--screen-share), #7c3aed);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: screenPulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .voice-active-badge {
+            background: linear-gradient(135deg, var(--voice-active), #7c3aed);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: voicePulse 1.5s infinite;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .recording-badge {
+            background: linear-gradient(135deg, var(--recording), #d97706);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: recordingPulse 1s infinite;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+            50% { opacity: 0.8; box-shadow: 0 4px 25px rgba(239, 68, 68, 0.5); }
+            100% { opacity: 1; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
+        }
+
+        @keyframes screenPulse {
+            0% { opacity: 1; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+            50% { opacity: 0.8; box-shadow: 0 4px 25px rgba(139, 92, 246, 0.5); }
+            100% { opacity: 1; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        }
+
+        @keyframes voicePulse {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 25px rgba(139, 92, 246, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        }
+
+        @keyframes recordingPulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            padding: 30px 0;
+            gap: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+
+        .video-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .video-container {
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            position: relative;
+            aspect-ratio: 16/9;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .video-container:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        #broadcastVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: #000;
+            transform: scaleX(1);
+        }
+
+        .video-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
+            color: var(--gray);
+            padding: 50px;
+            text-align: center;
+        }
+
+        .video-placeholder i {
+            font-size: 80px;
+            margin-bottom: 24px;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+        .video-placeholder h3 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--light);
+        }
+
+        .video-placeholder p {
+            font-size: 15px;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .broadcaster-info {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideInLeft 0.5s ease-out;
+        }
+
+        .camera-status {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        .screen-share-status {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideInLeft 0.5s ease-out;
+            z-index: 10;
+        }
+
+        .voice-status {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.5s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .controls-section {
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 24px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent);
+            transition: height 0.3s;
+        }
+
+        .control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--border);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover::before {
+            height: 100%;
+        }
+
+        .control-btn.active {
+            background-color: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .control-btn.voice-active {
+            background-color: rgba(139, 92, 246, 0.15);
+            border-color: var(--voice-active);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+        }
+
+        .control-btn.recording-active {
+            background-color: rgba(245, 158, 11, 0.15);
+            border-color: var(--warning);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+        }
+
+        .control-btn.screen-share-active {
+            background-color: rgba(139, 92, 246, 0.15);
+            border-color: var(--screen-share);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+        }
+
+        .control-btn i {
+            font-size: 28px;
+            transition: all 0.3s;
+        }
+
+        .control-btn.broadcast-btn i {
+            color: var(--danger);
+        }
+
+        .control-btn.mic-btn i {
+            color: var(--success);
+        }
+
+        .control-btn.mic-btn.muted i {
+            color: var(--danger);
+        }
+
+        .control-btn.camera-btn i {
+            color: var(--primary);
+        }
+
+        .control-btn.record-btn i {
+            color: var(--warning);
+        }
+
+        .control-btn.voice-btn i {
+            color: var(--voice-active);
+        }
+
+        .control-btn.screen-share-btn i {
+            color: var(--screen-share);
+        }
+
+        .control-btn.record-btn.recording i {
+            animation: recordingIcon 1s infinite;
+        }
+
+        .control-btn.voice-btn.speaking i {
+            animation: speakingIcon 1s infinite;
+        }
+
+        @keyframes recordingIcon {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes speakingIcon {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .control-label {
+            font-weight: 700;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .control-status {
+            font-size: 13px;
+            color: var(--gray);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .chat-section {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 1200px) {
+            .chat-section {
+                max-width: 100%;
+            }
+        }
+
+        .chat-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+
+        .message {
+            padding: 16px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid transparent;
+            animation: messageAppear 0.3s ease-out;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .message:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes messageAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.broadcaster {
+            border-left-color: var(--broadcaster);
+            background-color: rgba(220, 38, 38, 0.12);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .message.system {
+            border-left-color: var(--warning);
+            background-color: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            font-style: italic;
+        }
+
+        .message.voice {
+            border-left-color: var(--voice-active);
+            background-color: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .message.screen-share {
+            border-left-color: var(--screen-share);
+            background-color: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .message-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .message-role {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .broadcaster-tag {
+            background: linear-gradient(135deg, var(--broadcaster), #b91c1c);
+            color: white;
+        }
+
+        .viewer-tag {
+            background: linear-gradient(135deg, var(--viewer), #1d4ed8);
+            color: white;
+        }
+
+        .voice-tag {
+            background: linear-gradient(135deg, var(--voice-active), #7c3aed);
+            color: white;
+        }
+
+        .screen-share-tag {
+            background: linear-gradient(135deg, var(--screen-share), #7c3aed);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .message-content {
+            font-size: 14px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .chat-input {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-form input {
+            flex: 1;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .chat-form input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-form input::placeholder {
+            color: var(--gray);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: var(--dark-light);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            padding: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            animation: modalAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-modal:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            transform: rotate(90deg);
+        }
+
+        .recording-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .recording-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .recording-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .recording-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .recording-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--light);
+        }
+
+        .recording-details {
+            font-size: 13px;
+            color: var(--gray);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .recording-details i {
+            font-size: 12px;
+        }
+
+        .users-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .user-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-main {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .user-status {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .user-status.online {
+            color: var(--success);
+        }
+
+        .user-status.speaking {
+            color: var(--voice-active);
+            animation: blink 1s infinite;
+        }
+
+        .user-status.typing {
+            color: var(--warning);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .toast {
+            padding: 20px;
+            background-color: var(--dark-light);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: toastSlideIn 0.4s forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes toastSlideIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+        }
+
+        .toast-success::before {
+            background-color: var(--success);
+        }
+
+        .toast-error::before {
+            background-color: var(--danger);
+        }
+
+        .toast-warning::before {
+            background-color: var(--warning);
+        }
+
+        .toast-info::before {
+            background-color: var(--primary);
+        }
+
+        .toast-voice::before {
+            background-color: var(--voice-active);
+        }
+
+        .toast-screen::before {
+            background-color: var(--screen-share);
+        }
+
+        .toast i {
+            font-size: 24px;
+            margin-top: 2px;
+        }
+
+        .toast-success i {
+            color: var(--success);
+        }
+
+        .toast-error i {
+            color: var(--danger);
+        }
+
+        .toast-warning i {
+            color: var(--warning);
+        }
+
+        .toast-info i {
+            color: var(--primary);
+        }
+
+        .toast-voice i {
+            color: var(--voice-active);
+        }
+
+        .toast-screen i {
+            color: var(--screen-share);
+        }
+
+        .toast-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--light);
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .toast-close:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+        }
+
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .loader-spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--light);
+            text-align: center;
+        }
+
+        .loader-subtext {
+            font-size: 14px;
+            color: var(--gray);
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: var(--gray);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            opacity: 0.3;
+        }
+
+        .empty-state h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--light);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+            max-width: 300px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 24px 0;
+            color: var(--gray);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        footer p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Voice Feature Specific Styles */
+        .voice-controls {
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-top: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .voice-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .voice-controls-header h3 {
+            font-size: 17px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .voice-controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .voice-controls-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .voice-user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .voice-user-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--voice-active);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .voice-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .voice-user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--voice-active), #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .voice-user-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .voice-user-status {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .voice-user-status.speaking {
+            color: var(--voice-active);
+            font-weight: 800;
+        }
+
+        .voice-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--gray);
+        }
+
+        .voice-indicator.active {
+            background-color: var(--voice-active);
+            box-shadow: 0 0 10px var(--voice-active);
+            animation: voiceIndicator 1s infinite;
+        }
+
+        @keyframes voiceIndicator {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background: linear-gradient(135deg, white, #f0f0f0);
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--voice-active), #7c3aed);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Screen Share Specific Styles */
+        .screen-share-controls {
+            background-color: var(--dark-light);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border);
+            margin-top: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .screen-share-controls.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen-share-controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .screen-share-controls-header h3 {
+            font-size: 17px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .screen-share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .screen-share-option {
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .screen-share-option:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: var(--screen-share);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .screen-share-option.active {
+            background-color: rgba(139, 92, 246, 0.15);
+            border-color: var(--screen-share);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+        }
+
+        .screen-share-option i {
+            font-size: 32px;
+            color: var(--screen-share);
+        }
+
+        .screen-share-option-label {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .screen-share-option-desc {
+            font-size: 12px;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+
+        /* Recording specific styles */
+        .recording-timer {
+            position: absolute;
+            top: 80px;
+            left: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            color: var(--warning);
+            display: none;
+            z-index: 10;
+        }
+
+        /* Quality indicator */
+        .quality-indicator {
+            position: absolute;
+            bottom: 80px;
+            left: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 10;
+        }
+
+        .quality-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+        }
+
+        .quality-dot.good { background-color: var(--success); }
+        .quality-dot.fair { background-color: var(--warning); }
+        .quality-dot.poor { background-color: var(--danger); }
+
+        /* Connection status */
+        .connection-status {
+            position: fixed;
+            top: 100px;
+            right: 24px;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            animation: slideInRight 0.5s ease-out;
+            display: none;
+        }
+
+        .connection-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .connection-dot.disconnected {
+            background-color: var(--danger);
+            animation: none;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 640px) {
+            .auth-box {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .video-container {
+                border-radius: 12px;
+            }
+            
+            .broadcaster-info,
+            .camera-status,
+            .screen-share-status,
+            .voice-status {
+                padding: 8px 12px;
+                font-size: 11px;
+                top: 12px;
+                left: 12px;
+                right: 12px;
+            }
+            
+            .logo span {
+                display: none;
+            }
+        }
+
+        /* Background Service Worker Notification */
+        .background-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--screen-share);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* Background sharing indicator */
+        .background-sharing {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(139, 92, 246, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Section -->
+    <div id="authContainer" class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1><i class="fas fa-satellite-dish"></i> LiveCast Pro</h1>
+                <p>Professional live streaming with screen sharing & voice chat</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="loginTab">Login</div>
+                <div class="auth-tab" id="registerTab">Register</div>
+            </div>
+            
+            <div id="loginForm" class="auth-form active">
+                <div id="loginAlert" class="alert"></div>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" class="form-control" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-group checkbox">
+                        <div class="checkbox-input" id="rememberMeCheckbox"></div>
+                        <label for="rememberMeCheckbox">Remember me</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+            </div>
+            
+            <div id="registerForm" class="auth-form">
+                <div id="registerAlert" class="alert"></div>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" class="form-control" placeholder="Choose a username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" class="form-control" placeholder="Create a password (min. 6 characters)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="appContainer" class="app-container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container nav-content">
+                <div class="logo">
+                    <i class="fas fa-satellite-dish"></i>
+                    <span>LiveCast Pro</span>
+                    <div id="liveBadge" class="live-badge" style="display: none;">
+                        <i class="fas fa-circle"></i> LIVE
+                    </div>
+                    <div id="screenShareBadge" class="screen-share-badge" style="display: none;">
+                        <i class="fas fa-desktop"></i> SCREEN SHARING
+                    </div>
+                    <div id="voiceFeatureBadge" class="voice-active-badge" style="display: none;">
+                        <i class="fas fa-microphone"></i> VOICE ACTIVE
+                    </div>
+                    <div id="recordingBadge" class="recording-badge" style="display: none;">
+                        <i class="fas fa-circle"></i> RECORDING
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-badge">
+                        <i class="fas fa-user"></i>
+                        <span id="currentUsername">Username</span>
+                        <span id="userRole" class="user-role viewer-role">Viewer</span>
+                    </div>
+                    <button id="logoutBtn" class="btn btn-outline">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="connection-status" style="display: none;">
+            <div class="connection-dot"></div>
+            <span id="connectionStatusText">Connected</span>
+        </div>
+        
+        <!-- Background Sharing Indicator -->
+        <div id="backgroundSharingIndicator" class="background-sharing">
+            <i class="fas fa-broadcast-tower"></i>
+            <span>Screen Sharing Active in Background</span>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="container main-content">
+            <!-- Video Section -->
+            <div class="video-section">
+                <div class="video-container">
+                    <video id="broadcastVideo" autoplay playsinline muted></video>
+                    <div id="videoPlaceholder" class="video-placeholder">
+                        <i class="fas fa-video-slash"></i>
+                        <h3>No Live Broadcast</h3>
+                        <p>When a broadcaster starts streaming, the video will appear here automatically.</p>
+                        <p style="margin-top: 16px; font-size: 13px; color: var(--primary);">
+                            <i class="fas fa-info-circle"></i> You can start your own broadcast by clicking the "Start Broadcast" button below.
+                        </p>
+                    </div>
+                    <div id="broadcasterInfo" class="broadcaster-info" style="display: none;">
+                        <i class="fas fa-user"></i>
+                        <span>Broadcaster: <span id="broadcasterName">Unknown</span></span>
+                    </div>
+                    <div id="cameraStatus" class="camera-status" style="display: none;">
+                        <i class="fas fa-camera"></i>
+                        <span id="cameraType">Front Camera</span>
+                    </div>
+                    <div id="screenShareStatus" class="screen-share-status" style="display: none;">
+                        <i class="fas fa-desktop"></i>
+                        <span id="screenSource">Sharing Screen</span>
+                    </div>
+                    <div id="voiceStatus" class="voice-status" style="display: none;">
+                        <i class="fas fa-microphone"></i>
+                        <span id="currentSpeaker">No active speaker</span>
+                    </div>
+                    <div id="recordingTimer" class="recording-timer" style="display: none;">
+                        <i class="fas fa-circle"></i>
+                        <span id="recordingTime">00:00</span>
+                    </div>
+                    <div id="qualityIndicator" class="quality-indicator" style="display: none;">
+                        <div class="quality-dot good"></div>
+                        <span>Connection: Good</span>
+                    </div>
+                </div>
+                
+                <!-- Screen Share Controls (Only visible to broadcaster) -->
+                <div id="screenShareControls" class="screen-share-controls">
+                    <div class="screen-share-controls-header">
+                        <h3><i class="fas fa-desktop"></i> Screen Sharing Options</h3>
+                        <button id="closeScreenShareOptions" class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                    <div class="screen-share-options">
+                        <div class="screen-share-option active" data-type="screen">
+                            <i class="fas fa-desktop"></i>
+                            <div class="screen-share-option-label">Entire Screen</div>
+                            <div class="screen-share-option-desc">Share your complete screen</div>
+                        </div>
+                        <div class="screen-share-option" data-type="window">
+                            <i class="fas fa-window-maximize"></i>
+                            <div class="screen-share-option-label">Application Window</div>
+                            <div class="screen-share-option-desc">Share a specific application</div>
+                        </div>
+                        <div class="screen-share-option" data-type="tab">
+                            <i class="fas fa-window-restore"></i>
+                            <div class="screen-share-option-label">Browser Tab</div>
+                            <div class="screen-share-option-desc">Share a specific browser tab</div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="shareAudioCheckbox" checked>
+                            <span>Include system audio</span>
+                        </label>
+                    </div>
+                    <button id="startScreenShareBtn" class="btn btn-screen" style="width: 100%;">
+                        <i class="fas fa-play"></i> Start Screen Sharing
+                    </button>
+                </div>
+                
+                <!-- Voice Controls (Only visible when broadcaster enables voice feature) -->
+                <div id="voiceControls" class="voice-controls" style="display: none;">
+                    <div class="voice-controls-header">
+                        <h3><i class="fas fa-microphone"></i> Voice Communication</h3>
+                        <div id="voiceFeatureToggle" class="toggle-switch">
+                            <input type="checkbox" id="voiceToggle">
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </div>
+                    <div id="voiceControlsGrid" class="voice-controls-grid">
+                        <!-- Voice controls will be dynamically added here -->
+                        <div class="empty-state" style="padding: 20px; grid-column: 1 / -1;">
+                            <i class="fas fa-microphone-slash"></i>
+                            <h4>No active voice participants</h4>
+                            <p>When viewers join voice chat, they will appear here</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Controls Section -->
+                <div class="controls-section">
+                    <div class="controls-grid">
+                        <!-- Broadcast Control -->
+                        <div id="broadcastBtn" class="control-btn broadcast-btn">
+                            <i class="fas fa-broadcast-tower"></i>
+                            <span class="control-label">Start Broadcast</span>
+                            <span class="control-status">Become the broadcaster</span>
+                        </div>
+                        
+                        <!-- Microphone Control -->
+                        <div id="micControl" class="control-btn mic-btn" style="display: none;">
+                            <i class="fas fa-microphone"></i>
+                            <span class="control-label">Microphone</span>
+                            <span class="control-status">Click to mute/unmute</span>
+                        </div>
+                        
+                        <!-- Camera Control -->
+                        <div id="cameraControl" class="control-btn camera-btn" style="display: none;">
+                            <i class="fas fa-camera"></i>
+                            <span class="control-label">Switch Camera</span>
+                            <span class="control-status">Front → Back</span>
+                        </div>
+                        
+                        <!-- Screen Share Control -->
+                        <div id="screenShareControl" class="control-btn screen-share-btn" style="display: none;">
+                            <i class="fas fa-desktop"></i>
+                            <span class="control-label">Share Screen</span>
+                            <span class="control-status">Broadcast your screen</span>
+                        </div>
+                        
+                        <!-- Audio Control -->
+                        <div id="audioControl" class="control-btn">
+                            <i class="fas fa-volume-up"></i>
+                            <span class="control-label">Audio</span>
+                            <span class="control-status">Click to mute/unmute</span>
+                        </div>
+                        
+                        <!-- Voice Feature Control (Broadcaster) -->
+                        <div id="voiceFeatureBtn" class="control-btn voice-btn" style="display: none;">
+                            <i class="fas fa-microphone-alt"></i>
+                            <span class="control-label">Enable Voice</span>
+                            <span class="control-status">Allow viewer voice chat</span>
+                        </div>
+                        
+                        <!-- Viewer Voice Control -->
+                        <div id="viewerVoiceBtn" class="control-btn voice-btn" style="display: none;">
+                            <i class="fas fa-microphone"></i>
+                            <span class="control-label">Speak Live</span>
+                            <span class="control-status">Click to speak to broadcaster</span>
+                        </div>
+                        
+                        <!-- Recording Control -->
+                        <div id="recordBtn" class="control-btn record-btn">
+                            <i class="fas fa-circle"></i>
+                            <span class="control-label">Record</span>
+                            <span class="control-status">Click to start recording</span>
+                        </div>
+                        
+                        <!-- View Recordings -->
+                        <div id="viewRecordingsBtn" class="control-btn">
+                            <i class="fas fa-file-video"></i>
+                            <span class="control-label">Recordings</span>
+                            <span class="control-status">View your recordings</span>
+                        </div>
+                        
+                        <!-- View Users -->
+                        <div id="viewUsersBtn" class="control-btn">
+                            <i class="fas fa-users"></i>
+                            <span class="control-label">Viewers</span>
+                            <span class="control-status">See who's watching</span>
+                        </div>
+                        
+                        <!-- Voice Participants -->
+                        <div id="voiceParticipantsBtn" class="control-btn" style="display: none;">
+                            <i class="fas fa-user-friends"></i>
+                            <span class="control-label">Voice Chat</span>
+                            <span class="control-status">View voice participants</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <div class="chat-header">
+                    <h3><i class="fas fa-comments"></i> Live Chat</h3>
+                    <span id="onlineCount">1 online</span>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message system">
+                        <div class="message-content">
+                            Welcome to LiveCast Pro! Start a broadcast or join as a viewer. You can also share your screen and use voice chat.
+                        </div>
+                        <div class="message-time">Just now</div>
+                    </div>
+                </div>
+                
+                <div class="chat-input">
+                    <form id="chatForm">
+                        <div class="chat-form">
+                            <input type="text" id="chatInput" placeholder="Type your message..." autocomplete="off" maxlength="500">
+                            <button type="submit" class="btn btn-primary" style="padding: 16px 24px;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p>
+                    <i class="fas fa-satellite-dish"></i>
+                    LiveCast Pro &copy; 2024 - Professional Live Streaming Platform
+                    <i class="fas fa-heart" style="color: var(--danger); margin-left: 10px;"></i>
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Modals -->
+    <div id="recordingsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-video"></i> Your Recordings</h3>
+                <button class="close-modal" data-modal="recordingsModal">&times;</button>
+            </div>
+            <div id="recordingsList" class="recording-list">
+                <div class="empty-state">
+                    <i class="fas fa-file-video"></i>
+                    <h4>No recordings yet</h4>
+                    <p>Start recording a broadcast to save videos locally. Recordings are automatically downloaded when you stop recording.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="usersModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-users"></i> Online Users</h3>
+                <button class="close-modal" data-modal="usersModal">&times;</button>
+            </div>
+            <div id="usersList" class="users-list">
+                <div class="user-item">
+                    <div class="user-main">
+                        <div class="user-avatar">S</div>
+                        <div class="user-details">
+                            <div class="user-name">System</div>
+                            <div class="user-status online">Online</div>
+                        </div>
+                    </div>
+                    <div class="user-role broadcaster-role">Broadcaster</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Voice Participants Modal -->
+    <div id="voiceParticipantsModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-users"></i> Voice Participants</h3>
+                <button class="close-modal" data-modal="voiceParticipantsModal">&times;</button>
+            </div>
+            <div id="voiceParticipantsList" class="users-list">
+                <div class="empty-state">
+                    <i class="fas fa-microphone-slash"></i>
+                    <h4>No active voice participants</h4>
+                    <p>When voice feature is enabled, participants will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- Background Service Notification -->
+    <div id="backgroundNotification" class="background-notification">
+        <i class="fas fa-broadcast-tower"></i>
+        <div>
+            <strong>Screen Sharing Active</strong>
+            <div style="font-size: 13px; margin-top: 4px;">Stream will continue in background</div>
+        </div>
+    </div>
+    
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <div class="loader-text" id="loaderText">Loading...</div>
+        <div class="loader-subtext" id="loaderSubtext">Please wait while we set up your streaming environment</div>
+    </div>
+    
+    <!-- Hidden canvas for recording -->
+    <canvas id="recordingCanvas" style="display: none;"></canvas>
+
+    <script>
+        // ==============================================
+        // COMPLETE FIXED LIVECAST PRO APPLICATION
+        // ==============================================
+
+        // Global Application State
+        const appState = {
+            // User Management
+            currentUser: null,
+            isBroadcaster: false,
+            currentBroadcaster: null,
+            
+            // Media State
+            isMuted: false,
+            isAudioMuted: false,
+            isRecording: false,
+            isLive: false,
+            mediaStream: null,
+            currentVideoTrack: null,
+            
+            // Screen Sharing State - FIXED
+            isSharingScreen: false,
+            screenStream: null,
+            currentScreenTrack: null,
+            screenShareType: 'screen',
+            screenShareActive: false,
+            
+            // Camera State
+            currentCamera: 'front',
+            availableCameras: [],
+            
+            // Recording State
+            mediaRecorder: null,
+            recordedChunks: [],
+            recordings: [],
+            recordingAnimationId: null,
+            recordingStartTime: null,
+            recordingInterval: null,
+            
+            // Voice Feature State
+            voiceFeatureEnabled: false,
+            viewerVoiceEnabled: false,
+            isSpeaking: false,
+            viewerMediaStream: null,
+            viewerAudioContext: null,
+            viewerAnalyser: null,
+            viewerMicrophone: null,
+            activeSpeakers: [],
+            
+            // Connection & UI State
+            onlineUsers: [],
+            chatMessages: [],
+            typingUsers: new Set(),
+            connectionQuality: 'good',
+            lastPingTime: Date.now(),
+            autoReconnectAttempts: 0,
+            maxReconnectAttempts: 5,
+            
+            // Background State
+            isBackgroundMode: false,
+            backgroundTimer: null,
+            visibilityState: 'visible',
+            
+            // Settings
+            settings: {
+                rememberMe: true,
+                autoJoinVoice: false,
+                showConnectionInfo: true,
+                enableNotifications: true,
+                recordingQuality: 'high',
+                videoResolution: '720p'
+            }
+        };
+
+        // Canvas for Recording
+        const recordingCanvas = document.getElementById('recordingCanvas');
+        let recordingCtx = recordingCanvas.getContext('2d');
+
+        // Simulated WebSocket/Server
+        const simulatedServer = {
+            broadcasters: [],
+            users: [],
+            messages: [],
+            voiceParticipants: [],
+            serverTime: Date.now(),
+            
+            init() {
+                console.log('Initializing simulated server...');
+                
+                const savedData = localStorage.getItem('livecast_server_data');
+                if (savedData) {
+                    try {
+                        const parsed = JSON.parse(savedData);
+                        this.broadcasters = parsed.broadcasters || [];
+                        this.users = parsed.users || [];
+                        this.messages = parsed.messages || [];
+                        this.voiceParticipants = parsed.voiceParticipants || [];
+                    } catch (e) {
+                        console.error('Error loading server data:', e);
+                    }
+                }
+                
+                if (this.users.length === 0) {
+                    this.users = [
+                        {
+                            id: 'system_001',
+                            username: 'System',
+                            role: 'system',
+                            online: true,
+                            joinedAt: Date.now()
+                        }
+                    ];
+                }
+                
+                if (this.messages.length === 0) {
+                    this.messages = [
+                        {
+                            id: 'msg_welcome',
+                            userId: 'system_001',
+                            username: 'System',
+                            role: 'system',
+                            content: 'Welcome to LiveCast Pro! Start a broadcast or join as a viewer.',
+                            timestamp: Date.now(),
+                            type: 'system'
+                        }
+                    ];
+                }
+                
+                this.startSimulation();
+                return true;
+            },
+            
+            startSimulation() {
+                setInterval(() => {
+                    this.serverTime = Date.now();
+                    this.simulateUserActivity();
+                    this.saveToStorage();
+                    
+                    if (appState.currentUser) {
+                        updateOnlineUsers();
+                        updateConnectionQuality();
+                    }
+                }, 3000);
+                
+                setInterval(() => {
+                    this.simulateNetworkChanges();
+                }, 10000);
+            },
+            
+            simulateUserActivity() {
+                if (Math.random() > 0.7 && this.users.length < 10) {
+                    const demoUsers = [
+                        { id: 'demo_1', username: 'Alex_Streamer', role: 'viewer', online: true },
+                        { id: 'demo_2', username: 'Sarah_Viewer', role: 'viewer', online: true }
+                    ];
+                    
+                    const randomUser = demoUsers[Math.floor(Math.random() * demoUsers.length)];
+                    if (!this.users.find(u => u.id === randomUser.id)) {
+                        this.users.push({
+                            ...randomUser,
+                            joinedAt: Date.now()
+                        });
+                        
+                        this.addMessage({
+                            userId: 'system_001',
+                            username: 'System',
+                            role: 'system',
+                            content: `👋 ${randomUser.username} joined the stream`,
+                            type: 'system'
+                        });
+                    }
+                }
+            },
+            
+            simulateNetworkChanges() {
+                const qualities = ['good', 'fair', 'poor'];
+                const randomQuality = qualities[Math.floor(Math.random() * qualities.length)];
+                
+                if (Math.random() > 0.7) {
+                    appState.connectionQuality = randomQuality;
+                    updateConnectionQuality();
+                }
+            },
+            
+            saveToStorage() {
+                const data = {
+                    broadcasters: this.broadcasters,
+                    users: this.users,
+                    messages: this.messages,
+                    voiceParticipants: this.voiceParticipants,
+                    lastUpdated: Date.now()
+                };
+                
+                try {
+                    localStorage.setItem('livecast_server_data', JSON.stringify(data));
+                } catch (e) {
+                    console.error('Error saving server data:', e);
+                }
+            },
+            
+            addUser(user) {
+                const existingIndex = this.users.findIndex(u => u.id === user.id);
+                
+                if (existingIndex >= 0) {
+                    this.users[existingIndex] = {
+                        ...this.users[existingIndex],
+                        ...user,
+                        lastSeen: Date.now()
+                    };
+                } else {
+                    this.users.push({
+                        ...user,
+                        joinedAt: Date.now(),
+                        lastSeen: Date.now()
+                    });
+                }
+                
+                return user;
+            },
+            
+            removeUser(userId) {
+                const user = this.users.find(u => u.id === userId);
+                this.users = this.users.filter(u => u.id !== userId);
+                
+                this.removeVoiceParticipant(userId);
+                
+                if (this.broadcasters.some(b => b.id === userId)) {
+                    this.removeBroadcaster(userId);
+                }
+                
+                if (user) {
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `👋 ${user.username} left the stream`,
+                        type: 'system'
+                    });
+                }
+                
+                return user;
+            },
+            
+            setBroadcaster(user) {
+                const prevBroadcaster = this.broadcasters[0];
+                this.broadcasters = [user];
+                
+                if (prevBroadcaster && prevBroadcaster.id !== user.id) {
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🔄 Broadcaster switched to ${user.username}`,
+                        type: 'system'
+                    });
+                } else if (!prevBroadcaster) {
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🎥 ${user.username} started broadcasting`,
+                        type: 'system'
+                    });
+                }
+                
+                return user;
+            },
+            
+            removeBroadcaster(userId) {
+                const broadcaster = this.broadcasters.find(b => b.id === userId);
+                this.broadcasters = this.broadcasters.filter(b => b.id !== userId);
+                
+                if (broadcaster) {
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `📴 ${broadcaster.username} stopped broadcasting`,
+                        type: 'system'
+                    });
+                }
+                
+                return broadcaster;
+            },
+            
+            getBroadcaster() {
+                return this.broadcasters.length > 0 ? this.broadcasters[0] : null;
+            },
+            
+            addVoiceParticipant(user) {
+                const existingIndex = this.voiceParticipants.findIndex(u => u.id === user.id);
+                
+                if (existingIndex >= 0) {
+                    this.voiceParticipants[existingIndex] = {
+                        ...this.voiceParticipants[existingIndex],
+                        ...user,
+                        joinedAt: Date.now()
+                    };
+                } else {
+                    this.voiceParticipants.push({
+                        ...user,
+                        joinedAt: Date.now(),
+                        lastActive: Date.now()
+                    });
+                    
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🎤 ${user.username} joined voice chat`,
+                        type: 'system'
+                    });
+                }
+                
+                return user;
+            },
+            
+            removeVoiceParticipant(userId) {
+                const participant = this.voiceParticipants.find(u => u.id === userId);
+                this.voiceParticipants = this.voiceParticipants.filter(u => u.id !== userId);
+                
+                if (participant) {
+                    this.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🔇 ${participant.username} left voice chat`,
+                        type: 'system'
+                    });
+                }
+                
+                return participant;
+            },
+            
+            updateVoiceParticipantStatus(userId, isSpeaking) {
+                const participant = this.voiceParticipants.find(u => u.id === userId);
+                
+                if (participant) {
+                    participant.isSpeaking = isSpeaking;
+                    participant.lastActive = Date.now();
+                    
+                    if (isSpeaking) {
+                        if (!appState.activeSpeakers.includes(userId)) {
+                            appState.activeSpeakers.push(userId);
+                        }
+                    } else {
+                        appState.activeSpeakers = appState.activeSpeakers.filter(id => id !== userId);
+                    }
+                    
+                    updateVoiceUI();
+                }
+            },
+            
+            getVoiceParticipants() {
+                return this.voiceParticipants;
+            },
+            
+            addMessage(message) {
+                const newMessage = {
+                    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    userId: message.userId || appState.currentUser?.id || 'unknown',
+                    username: message.username || 'Unknown',
+                    role: message.role || 'viewer',
+                    content: message.content,
+                    timestamp: Date.now(),
+                    type: message.type || 'chat'
+                };
+                
+                this.messages.push(newMessage);
+                
+                if (this.messages.length > 200) {
+                    this.messages = this.messages.slice(-200);
+                }
+                
+                if (appState.currentUser) {
+                    updateChatMessages();
+                }
+                
+                return newMessage;
+            },
+            
+            getMessages() {
+                return this.messages;
+            },
+            
+            getUsers() {
+                return this.users;
+            }
+        };
+
+        // ==============================================
+        // AUTHENTICATION FUNCTIONS - FIXED
+        // ==============================================
+
+        function initAuth() {
+            console.log('Initializing authentication...');
+            
+            const savedUser = localStorage.getItem('livecast_current_user');
+            const rememberMe = localStorage.getItem('livecast_remember_me') === 'true';
+            
+            if (savedUser && rememberMe) {
+                try {
+                    appState.currentUser = JSON.parse(savedUser);
+                    showApp();
+                    simulatedServer.init();
+                    showToast('Welcome back, ' + appState.currentUser.username + '!', 'success');
+                    return;
+                } catch (e) {
+                    console.error('Error loading saved user:', e);
+                }
+            }
+            
+            document.getElementById('loginTab').addEventListener('click', () => switchAuthTab('login'));
+            document.getElementById('registerTab').addEventListener('click', () => switchAuthTab('register'));
+            
+            document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
+            document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
+            
+            document.getElementById('rememberMeCheckbox').addEventListener('click', toggleCheckbox);
+            
+            simulatedServer.init();
+            
+            setTimeout(() => {
+                const users = JSON.parse(localStorage.getItem('livecast_users') || '[]');
+                if (users.length === 0) {
+                    const demoUsers = [
+                        { id: 'user_1', username: 'streamer', email: 'streamer@example.com', password: 'stream123', createdAt: Date.now() },
+                        { id: 'user_2', username: 'viewer', email: 'viewer@example.com', password: 'view123', createdAt: Date.now() },
+                        { id: 'user_3', username: 'demo', email: 'demo@example.com', password: 'demo123', createdAt: Date.now() }
+                    ];
+                    localStorage.setItem('livecast_users', JSON.stringify(demoUsers));
+                }
+            }, 1000);
+        }
+
+        function switchAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.getElementById('loginTab').classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('registerTab').classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+
+        function toggleCheckbox() {
+            const checkbox = document.getElementById('rememberMeCheckbox');
+            checkbox.classList.toggle('checked');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMeCheckbox').classList.contains('checked');
+            
+            if (!username || !password) {
+                showAlert('loginAlert', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            showLoader('Authenticating...');
+            
+            setTimeout(() => {
+                const users = JSON.parse(localStorage.getItem('livecast_users') || '[]');
+                const user = users.find(u => u.username === username && u.password === password);
+                
+                if (!user) {
+                    hideLoader();
+                    showAlert('loginAlert', 'Invalid username or password', 'error');
+                    return;
+                }
+                
+                appState.currentUser = {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    role: 'viewer',
+                    joinedAt: Date.now()
+                };
+                
+                if (rememberMe) {
+                    localStorage.setItem('livecast_current_user', JSON.stringify(appState.currentUser));
+                    localStorage.setItem('livecast_remember_me', 'true');
+                } else {
+                    localStorage.removeItem('livecast_current_user');
+                    localStorage.removeItem('livecast_remember_me');
+                }
+                
+                simulatedServer.addUser({
+                    id: appState.currentUser.id,
+                    username: appState.currentUser.username,
+                    role: 'viewer',
+                    online: true
+                });
+                
+                hideLoader();
+                showApp();
+                showToast('Successfully logged in! Welcome to LiveCast Pro.', 'success');
+            }, 500);
+        }
+
+        function handleRegister(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!username || !email || !password || !confirmPassword) {
+                showAlert('registerAlert', 'Please fill in all fields', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showAlert('registerAlert', 'Passwords do not match', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('registerAlert', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showAlert('registerAlert', 'Please enter a valid email address', 'error');
+                return;
+            }
+            
+            showLoader('Creating account...');
+            
+            setTimeout(() => {
+                const users = JSON.parse(localStorage.getItem('livecast_users') || '[]');
+                
+                if (users.some(u => u.username === username)) {
+                    hideLoader();
+                    showAlert('registerAlert', 'Username already exists', 'error');
+                    return;
+                }
+                
+                if (users.some(u => u.email === email)) {
+                    hideLoader();
+                    showAlert('registerAlert', 'Email already registered', 'error');
+                    return;
+                }
+                
+                const newUser = {
+                    id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    username,
+                    email,
+                    password,
+                    createdAt: Date.now()
+                };
+                
+                users.push(newUser);
+                localStorage.setItem('livecast_users', JSON.stringify(users));
+                
+                appState.currentUser = {
+                    id: newUser.id,
+                    username: newUser.username,
+                    email: newUser.email,
+                    role: 'viewer',
+                    joinedAt: Date.now()
+                };
+                
+                localStorage.setItem('livecast_current_user', JSON.stringify(appState.currentUser));
+                localStorage.setItem('livecast_remember_me', 'true');
+                
+                simulatedServer.addUser({
+                    id: appState.currentUser.id,
+                    username: appState.currentUser.username,
+                    role: 'viewer',
+                    online: true
+                });
+                
+                hideLoader();
+                showApp();
+                showToast('Account created successfully! Welcome to LiveCast Pro.', 'success');
+                
+                setTimeout(() => switchAuthTab('login'), 500);
+            }, 500);
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showApp() {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'flex';
+            
+            document.getElementById('currentUsername').textContent = appState.currentUser.username;
+            
+            const savedRecordings = localStorage.getItem(`livecast_recordings_${appState.currentUser.id}`);
+            if (savedRecordings) {
+                try {
+                    appState.recordings = JSON.parse(savedRecordings);
+                } catch (e) {
+                    console.error('Error loading recordings:', e);
+                    appState.recordings = [];
+                }
+            }
+            
+            initApp();
+        }
+
+        function logout() {
+            simulatedServer.removeUser(appState.currentUser.id);
+            
+            if (appState.isBroadcaster) {
+                stopBroadcast();
+            }
+            
+            if (appState.isRecording) {
+                stopRecording();
+            }
+            
+            if (appState.isSpeaking) {
+                stopViewerVoice();
+            }
+            
+            localStorage.removeItem('livecast_current_user');
+            appState.currentUser = null;
+            
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'flex';
+            
+            document.getElementById('loginFormElement').reset();
+            document.getElementById('registerFormElement').reset();
+            document.getElementById('rememberMeCheckbox').classList.remove('checked');
+            
+            showToast('Logged out successfully', 'info');
+        }
+
+        // ==============================================
+        // MAIN APPLICATION FUNCTIONS - FIXED
+        // ==============================================
+
+        function initApp() {
+            console.log('Initializing LiveCast Pro...');
+            
+            setupEventListeners();
+            
+            const broadcaster = simulatedServer.getBroadcaster();
+            if (broadcaster) {
+                updateBroadcasterUI(broadcaster);
+            }
+            
+            updateOnlineUsers();
+            updateChatMessages();
+            updateVoiceUI();
+            
+            startPeriodicUpdates();
+            
+            showToast('Welcome to LiveCast Pro!', 'success');
+            
+            updateConnectionStatus(true);
+            
+            // Initialize background sharing detection
+            initBackgroundSharing();
+        }
+
+        function setupEventListeners() {
+            // Navigation
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // Broadcast controls
+            document.getElementById('broadcastBtn').addEventListener('click', toggleBroadcast);
+            document.getElementById('micControl').addEventListener('click', toggleMic);
+            document.getElementById('cameraControl').addEventListener('click', switchCamera);
+            document.getElementById('screenShareControl').addEventListener('click', toggleScreenShare);
+            document.getElementById('audioControl').addEventListener('click', toggleAudio);
+            document.getElementById('voiceFeatureBtn').addEventListener('click', toggleVoiceFeature);
+            document.getElementById('viewerVoiceBtn').addEventListener('click', toggleViewerVoice);
+            document.getElementById('recordBtn').addEventListener('click', toggleRecording);
+            document.getElementById('viewRecordingsBtn').addEventListener('click', showRecordingsModal);
+            document.getElementById('viewUsersBtn').addEventListener('click', showUsersModal);
+            document.getElementById('voiceParticipantsBtn').addEventListener('click', showVoiceParticipantsModal);
+            
+            // Screen share controls - FIXED
+            document.getElementById('closeScreenShareOptions').addEventListener('click', () => {
+                document.getElementById('screenShareControls').classList.remove('active');
+            });
+            
+            document.querySelectorAll('.screen-share-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.screen-share-option').forEach(o => o.classList.remove('active'));
+                    this.classList.add('active');
+                    appState.screenShareType = this.dataset.type;
+                });
+            });
+            
+            document.getElementById('startScreenShareBtn').addEventListener('click', startScreenShare);
+            
+            // Chat
+            document.getElementById('chatForm').addEventListener('submit', sendChatMessage);
+            
+            // Typing indicator
+            const chatInput = document.getElementById('chatInput');
+            chatInput.addEventListener('input', () => {
+                if (appState.currentUser) {
+                    simulatedServer.setUserTyping(appState.currentUser.id, chatInput.value.length > 0);
+                }
+            });
+            
+            chatInput.addEventListener('blur', () => {
+                if (appState.currentUser) {
+                    simulatedServer.setUserTyping(appState.currentUser.id, false);
+                }
+            });
+            
+            // Voice toggle
+            document.getElementById('voiceToggle').addEventListener('change', function() {
+                appState.voiceFeatureEnabled = this.checked;
+                toggleVoiceFeature();
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal');
+                    document.getElementById(modalId).style.display = 'none';
+                });
+            });
+            
+            // Close modals on overlay click
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // ==============================================
+        // BROADCAST FUNCTIONS - FIXED
+        // ==============================================
+
+        async function toggleBroadcast() {
+            if (appState.isBroadcaster) {
+                stopBroadcast();
+            } else {
+                await startBroadcast();
+            }
+        }
+
+        async function startBroadcast() {
+            showLoader('Starting broadcast...', 'Setting up camera and microphone');
+            
+            try {
+                await getAvailableCameras();
+                
+                const constraints = {
+                    video: {
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        frameRate: { ideal: 30 }
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        channelCount: 2
+                    }
+                };
+                
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                appState.mediaStream = stream;
+                appState.currentVideoTrack = stream.getVideoTracks()[0];
+                appState.isBroadcaster = true;
+                appState.isLive = true;
+                appState.currentCamera = 'front';
+                
+                simulatedServer.setBroadcaster({
+                    id: appState.currentUser.id,
+                    username: appState.currentUser.username,
+                    role: 'broadcaster',
+                    online: true
+                });
+                
+                updateBroadcasterUI();
+                hideLoader();
+                
+                showToast('You are now broadcasting live!', 'success');
+                
+            } catch (error) {
+                hideLoader();
+                console.error('Error starting broadcast:', error);
+                
+                let errorMessage = 'Failed to start broadcast. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage += 'Please allow camera and microphone access.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No camera or microphone found.';
+                } else if (error.name === 'NotReadableError') {
+                    errorMessage += 'Camera or microphone is already in use.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showToast(errorMessage, 'error');
+            }
+        }
+
+        function stopBroadcast() {
+            if (appState.isSharingScreen) {
+                stopScreenShare();
+            }
+            
+            if (appState.isRecording) {
+                stopRecording();
+            }
+            
+            if (appState.isSpeaking) {
+                stopViewerVoice();
+            }
+            
+            appState.voiceFeatureEnabled = false;
+            document.getElementById('voiceControls').style.display = 'none';
+            document.getElementById('voiceFeatureBadge').style.display = 'none';
+            document.getElementById('voiceParticipantsBtn').style.display = 'none';
+            
+            if (appState.mediaStream) {
+                appState.mediaStream.getTracks().forEach(track => track.stop());
+                appState.mediaStream = null;
+                appState.currentVideoTrack = null;
+            }
+            
+            appState.isBroadcaster = false;
+            appState.isLive = false;
+            appState.currentCamera = 'front';
+            
+            simulatedServer.removeBroadcaster(appState.currentUser.id);
+            
+            updateBroadcasterUI();
+            
+            showToast('Broadcast stopped', 'info');
+        }
+
+        function updateBroadcasterUI(broadcaster = null) {
+            const isBroadcaster = appState.isBroadcaster;
+            const currentBroadcaster = broadcaster || simulatedServer.getBroadcaster();
+            
+            document.getElementById('userRole').textContent = isBroadcaster ? 'Broadcaster' : 'Viewer';
+            document.getElementById('userRole').className = `user-role ${isBroadcaster ? 'broadcaster' : 'viewer'}-role`;
+            
+            const broadcastBtn = document.getElementById('broadcastBtn');
+            if (isBroadcaster) {
+                broadcastBtn.classList.add('active');
+                broadcastBtn.innerHTML = `
+                    <i class="fas fa-broadcast-tower"></i>
+                    <span class="control-label">Stop Broadcast</span>
+                    <span class="control-status">You are broadcasting</span>
+                `;
+                
+                document.getElementById('micControl').style.display = 'flex';
+                document.getElementById('cameraControl').style.display = 'flex';
+                document.getElementById('screenShareControl').style.display = 'flex';
+                document.getElementById('voiceFeatureBtn').style.display = 'flex';
+                document.getElementById('voiceFeatureToggle').style.display = 'block';
+                document.getElementById('voiceParticipantsBtn').style.display = 'flex';
+                
+            } else {
+                broadcastBtn.classList.remove('active');
+                broadcastBtn.innerHTML = `
+                    <i class="fas fa-broadcast-tower"></i>
+                    <span class="control-label">Start Broadcast</span>
+                    <span class="control-status">Become the broadcaster</span>
+                `;
+                
+                document.getElementById('micControl').style.display = 'none';
+                document.getElementById('cameraControl').style.display = 'none';
+                document.getElementById('screenShareControl').style.display = 'none';
+                document.getElementById('voiceFeatureBtn').style.display = 'none';
+                document.getElementById('voiceFeatureToggle').style.display = 'none';
+                document.getElementById('voiceParticipantsBtn').style.display = 'none';
+            }
+            
+            document.getElementById('liveBadge').style.display = isBroadcaster ? 'flex' : 'none';
+            
+            const videoElement = document.getElementById('broadcastVideo');
+            const videoPlaceholder = document.getElementById('videoPlaceholder');
+            const broadcasterInfo = document.getElementById('broadcasterInfo');
+            const cameraStatus = document.getElementById('cameraStatus');
+            
+            if (isBroadcaster && appState.mediaStream) {
+                videoElement.srcObject = appState.mediaStream;
+                videoPlaceholder.style.display = 'none';
+                broadcasterInfo.style.display = 'flex';
+                cameraStatus.style.display = 'flex';
+                document.getElementById('broadcasterName').textContent = appState.currentUser.username;
+                document.getElementById('cameraType').textContent = appState.currentCamera === 'front' ? 'Front Camera' : 'Back Camera';
+                
+            } else if (currentBroadcaster) {
+                videoPlaceholder.style.display = 'none';
+                broadcasterInfo.style.display = 'flex';
+                document.getElementById('broadcasterName').textContent = currentBroadcaster.username;
+            } else {
+                videoElement.srcObject = null;
+                videoPlaceholder.style.display = 'flex';
+                broadcasterInfo.style.display = 'none';
+                cameraStatus.style.display = 'none';
+            }
+            
+            if (isBroadcaster) {
+                document.getElementById('cameraControl').innerHTML = `
+                    <i class="fas fa-camera"></i>
+                    <span class="control-label">Switch Camera</span>
+                    <span class="control-status">${appState.currentCamera === 'front' ? 'Front → Back' : 'Back → Front'}</span>
+                `;
+            }
+            
+            updateViewerVoiceUI();
+        }
+
+        // ==============================================
+        // SCREEN SHARING FUNCTIONS - COMPLETELY FIXED
+        // ==============================================
+
+        function toggleScreenShare() {
+            if (!appState.isBroadcaster) {
+                showToast('Only the broadcaster can share screen', 'error');
+                return;
+            }
+            
+            if (appState.isSharingScreen) {
+                stopScreenShare();
+            } else {
+                document.getElementById('screenShareControls').classList.add('active');
+            }
+        }
+
+        async function startScreenShare() {
+            if (!appState.isBroadcaster || !appState.mediaStream) {
+                showToast('You must be broadcasting to share screen', 'error');
+                return;
+            }
+            
+            document.getElementById('screenShareControls').classList.remove('active');
+            
+            showLoader('Starting screen share...', 'Select what you want to share');
+            
+            try {
+                // Check if getDisplayMedia is supported
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                    throw new Error('Screen sharing not supported in this browser');
+                }
+                
+                // Modern getDisplayMedia implementation
+                const displayMediaOptions = {
+                    video: {
+                        displaySurface: appState.screenShareType,
+                        cursor: "always"
+                    },
+                    audio: document.getElementById('shareAudioCheckbox').checked,
+                    selfBrowserSurface: "exclude",
+                    systemAudio: "include",
+                    surfaceSwitching: "include",
+                    monitorTypeSurfaces: "include"
+                };
+                
+                // Request screen sharing
+                const screenStream = await navigator.mediaDevices.getDisplayMedia(displayMediaOptions);
+                
+                // Handle when user stops sharing via browser UI
+                screenStream.getVideoTracks()[0].addEventListener('ended', () => {
+                    if (appState.isSharingScreen) {
+                        showToast('Screen sharing stopped by browser', 'warning');
+                        stopScreenShare();
+                    }
+                });
+                
+                // Store screen stream
+                appState.screenStream = screenStream;
+                appState.currentScreenTrack = screenStream.getVideoTracks()[0];
+                appState.isSharingScreen = true;
+                
+                // Replace camera track with screen track
+                replaceVideoTrackWithScreen(screenStream);
+                
+                hideLoader();
+                showToast('Screen sharing started successfully!', 'screen');
+                
+                simulatedServer.addMessage({
+                    userId: 'system_001',
+                    username: 'System',
+                    role: 'system',
+                    content: `🖥️ ${appState.currentUser.username} started sharing screen`,
+                    type: 'system'
+                });
+                
+                // Start background sharing monitoring
+                startBackgroundSharingMonitoring();
+                
+            } catch (error) {
+                hideLoader();
+                console.error('Error starting screen share:', error);
+                
+                let errorMessage = 'Failed to start screen sharing. ';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = 'Screen sharing permission denied by user';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = 'No screen sharing source available';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = 'Screen sharing not supported in this browser';
+                } else if (error.name === 'AbortError') {
+                    errorMessage = 'Screen sharing aborted by user';
+                } else if (error.message.includes('not supported')) {
+                    errorMessage = 'Screen sharing requires HTTPS or localhost';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showToast(errorMessage, 'error');
+            }
+        }
+
+        function replaceVideoTrackWithScreen(screenStream) {
+            if (!appState.mediaStream || !screenStream) return;
+            
+            // Get audio track from current stream
+            const audioTracks = appState.mediaStream.getAudioTracks();
+            const currentAudioTrack = audioTracks.length > 0 ? audioTracks[0] : null;
+            
+            // Stop current video track
+            if (appState.currentVideoTrack) {
+                appState.currentVideoTrack.stop();
+                appState.mediaStream.removeTrack(appState.currentVideoTrack);
+            }
+            
+            // Get screen video track
+            const screenVideoTrack = screenStream.getVideoTracks()[0];
+            
+            // Add screen video track to stream
+            appState.mediaStream.addTrack(screenVideoTrack);
+            appState.currentVideoTrack = screenVideoTrack;
+            
+            // If screen stream has audio, add it too
+            const screenAudioTracks = screenStream.getAudioTracks();
+            if (screenAudioTracks.length > 0) {
+                // Remove existing audio track if present
+                if (currentAudioTrack) {
+                    appState.mediaStream.removeTrack(currentAudioTrack);
+                    currentAudioTrack.stop();
+                }
+                // Add screen audio track
+                appState.mediaStream.addTrack(screenAudioTracks[0]);
+            } else if (currentAudioTrack) {
+                // Keep existing audio track if no screen audio
+                appState.mediaStream.addTrack(currentAudioTrack);
+            }
+            
+            // Update video element
+            const videoElement = document.getElementById('broadcastVideo');
+            videoElement.srcObject = appState.mediaStream;
+            
+            // Update UI
+            document.getElementById('cameraStatus').style.display = 'none';
+            document.getElementById('screenShareStatus').style.display = 'flex';
+            document.getElementById('screenShareBadge').style.display = 'flex';
+            
+            const settings = screenVideoTrack.getSettings();
+            const screenSource = settings.displaySurface || 'Screen';
+            document.getElementById('screenSource').textContent = `Sharing ${screenSource}`;
+            
+            updateScreenShareUI(true);
+            
+            if (appState.isRecording) {
+                stopRecordingCanvas();
+                startRecordingCanvas();
+                showToast('Recording continues with screen share', 'info');
+            }
+        }
+
+        function stopScreenShare() {
+            if (!appState.isSharingScreen) return;
+            
+            // Switch back to camera
+            switchBackToCamera();
+            
+            // Stop screen stream
+            if (appState.screenStream) {
+                appState.screenStream.getTracks().forEach(track => track.stop());
+                appState.screenStream = null;
+                appState.currentScreenTrack = null;
+            }
+            
+            appState.isSharingScreen = false;
+            
+            updateScreenShareUI(false);
+            
+            showToast('Screen sharing stopped', 'info');
+            
+            simulatedServer.addMessage({
+                userId: 'system_001',
+                username: 'System',
+                role: 'system',
+                content: `📷 ${appState.currentUser.username} switched back to camera`,
+                type: 'system'
+            });
+            
+            // Stop background monitoring
+            stopBackgroundSharingMonitoring();
+        }
+
+        async function switchBackToCamera() {
+            if (!appState.mediaStream || !appState.isBroadcaster) return;
+            
+            try {
+                // Remove screen track
+                if (appState.currentScreenTrack) {
+                    appState.mediaStream.removeTrack(appState.currentScreenTrack);
+                    appState.currentScreenTrack = null;
+                }
+                
+                // Get camera stream
+                const cameraConstraints = {
+                    video: {
+                        facingMode: appState.currentCamera === 'front' ? 'user' : 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: true
+                };
+                
+                const cameraStream = await navigator.mediaDevices.getUserMedia(cameraConstraints);
+                const cameraVideoTrack = cameraStream.getVideoTracks()[0];
+                
+                // Add camera video track
+                appState.mediaStream.addTrack(cameraVideoTrack);
+                appState.currentVideoTrack = cameraVideoTrack;
+                
+                // Update video element
+                const videoElement = document.getElementById('broadcastVideo');
+                videoElement.srcObject = appState.mediaStream;
+                
+                // Update UI
+                document.getElementById('cameraStatus').style.display = 'flex';
+                document.getElementById('screenShareStatus').style.display = 'none';
+                document.getElementById('screenShareBadge').style.display = 'none';
+                
+                updateScreenShareUI(false);
+                
+                // Stop unused audio tracks from camera stream
+                cameraStream.getAudioTracks().forEach(track => track.stop());
+                
+            } catch (error) {
+                console.error('Error switching back to camera:', error);
+                showToast('Failed to switch back to camera', 'error');
+            }
+        }
+
+        function updateScreenShareUI(isSharing) {
+            const screenShareControl = document.getElementById('screenShareControl');
+            const screenShareBadge = document.getElementById('screenShareBadge');
+            
+            if (isSharing) {
+                screenShareControl.classList.add('screen-share-active');
+                screenShareControl.innerHTML = `
+                    <i class="fas fa-stop-circle"></i>
+                    <span class="control-label">Stop Sharing</span>
+                    <span class="control-status">Click to stop screen share</span>
+                `;
+                screenShareBadge.style.display = 'flex';
+            } else {
+                screenShareControl.classList.remove('screen-share-active');
+                screenShareControl.innerHTML = `
+                    <i class="fas fa-desktop"></i>
+                    <span class="control-label">Share Screen</span>
+                    <span class="control-status">Broadcast your screen</span>
+                `;
+                screenShareBadge.style.display = 'none';
+                document.getElementById('screenShareStatus').style.display = 'none';
+            }
+        }
+
+        // ==============================================
+        // BACKGROUND SHARING IMPLEMENTATION
+        // ==============================================
+
+        function initBackgroundSharing() {
+            // Listen for visibility changes
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            
+            // Listen for page unload
+            window.addEventListener('beforeunload', handleBeforeUnload);
+            
+            // Listen for page hide (for mobile)
+            window.addEventListener('pagehide', handlePageHide);
+            
+            console.log('Background sharing initialized');
+        }
+
+        function handleVisibilityChange() {
+            const isVisible = document.visibilityState === 'visible';
+            
+            if (isVisible) {
+                // App came to foreground
+                appState.isBackgroundMode = false;
+                document.getElementById('backgroundSharingIndicator').style.display = 'none';
+                
+                if (appState.isSharingScreen) {
+                    showToast('Screen sharing resumed', 'info');
+                }
+            } else {
+                // App went to background
+                appState.isBackgroundMode = true;
+                
+                if (appState.isSharingScreen) {
+                    // Show background indicator
+                    document.getElementById('backgroundSharingIndicator').style.display = 'flex';
+                    
+                    // Show notification
+                    showBackgroundNotification();
+                    
+                    showToast('Screen sharing continues in background', 'screen');
+                }
+            }
+        }
+
+        function handleBeforeUnload(e) {
+            if (appState.isSharingScreen) {
+                e.preventDefault();
+                e.returnValue = 'Screen sharing is active. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        }
+
+        function handlePageHide() {
+            if (appState.isSharingScreen) {
+                console.log('Page hiding, screen sharing active');
+            }
+        }
+
+        function startBackgroundSharingMonitoring() {
+            // Start monitoring for background state
+            appState.backgroundTimer = setInterval(() => {
+                if (appState.isBackgroundMode && appState.isSharingScreen) {
+                    // Keep screen sharing alive in background
+                    keepScreenShareAlive();
+                }
+            }, 5000); // Check every 5 seconds
+        }
+
+        function stopBackgroundSharingMonitoring() {
+            if (appState.backgroundTimer) {
+                clearInterval(appState.backgroundTimer);
+                appState.backgroundTimer = null;
+            }
+        }
+
+        function keepScreenShareAlive() {
+            // This function keeps screen sharing active in background
+            if (appState.isSharingScreen && appState.screenStream) {
+                // Check if screen track is still active
+                const videoTrack = appState.screenStream.getVideoTracks()[0];
+                if (videoTrack && videoTrack.readyState === 'ended') {
+                    showToast('Screen sharing stopped in background', 'warning');
+                    stopScreenShare();
+                }
+            }
+        }
+
+        function showBackgroundNotification() {
+            const notification = document.getElementById('backgroundNotification');
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // ==============================================
+        // CAMERA FUNCTIONS - FIXED
+        // ==============================================
+
+        async function getAvailableCameras() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                appState.availableCameras = devices.filter(device => device.kind === 'videoinput');
+                console.log('Available cameras:', appState.availableCameras.length);
+            } catch (error) {
+                console.error('Error enumerating cameras:', error);
+            }
+        }
+
+        async function switchCamera() {
+            if (!appState.isBroadcaster) return;
+            
+            if (appState.isSharingScreen) {
+                showToast('Stopping screen share to switch camera', 'info');
+                stopScreenShare();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            showLoader('Switching camera...');
+            
+            try {
+                const newCameraType = appState.currentCamera === 'front' ? 'back' : 'front';
+                const newFacingMode = newCameraType === 'front' ? 'user' : 'environment';
+                
+                let audioTrack = null;
+                if (appState.mediaStream) {
+                    const audioTracks = appState.mediaStream.getAudioTracks();
+                    if (audioTracks.length > 0) {
+                        audioTrack = audioTracks[0];
+                    }
+                }
+                
+                if (appState.currentVideoTrack) {
+                    appState.mediaStream.removeTrack(appState.currentVideoTrack);
+                    appState.currentVideoTrack.stop();
+                }
+                
+                const constraints = {
+                    video: {
+                        facingMode: newFacingMode,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+                
+                let newStream;
+                try {
+                    newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (error) {
+                    delete constraints.video.facingMode;
+                    newStream = await navigator.mediaDevices.getUserMedia(constraints);
+                }
+                
+                const newVideoTrack = newStream.getVideoTracks()[0];
+                
+                const updatedStream = new MediaStream();
+                updatedStream.addTrack(newVideoTrack);
+                if (audioTrack) {
+                    updatedStream.addTrack(audioTrack);
+                }
+                
+                appState.mediaStream = updatedStream;
+                appState.currentVideoTrack = newVideoTrack;
+                appState.currentCamera = newCameraType;
+                
+                const videoElement = document.getElementById('broadcastVideo');
+                videoElement.srcObject = updatedStream;
+                videoElement.style.transform = 'scaleX(1)';
+                
+                document.getElementById('cameraType').textContent = newCameraType === 'front' ? 'Front Camera' : 'Back Camera';
+                document.getElementById('cameraControl').innerHTML = `
+                    <i class="fas fa-camera"></i>
+                    <span class="control-label">Switch Camera</span>
+                    <span class="control-status">${newCameraType === 'front' ? 'Front → Back' : 'Back → Front'}</span>
+                `;
+                
+                hideLoader();
+                showToast(`Switched to ${newCameraType} camera`, 'success');
+                
+                simulatedServer.addMessage({
+                    userId: 'system_001',
+                    username: 'System',
+                    role: 'system',
+                    content: `🎥 ${appState.currentUser.username} switched to ${newCameraType} camera`,
+                    type: 'system'
+                });
+                
+                if (appState.isRecording) {
+                    stopRecordingCanvas();
+                    startRecordingCanvas();
+                    showToast('Recording continues with new camera', 'info');
+                }
+                
+                newStream.getAudioTracks().forEach(track => track.stop());
+                
+            } catch (error) {
+                hideLoader();
+                console.error('Error switching camera:', error);
+                showToast('Failed to switch camera. The other camera might not be available.', 'error');
+            }
+        }
+
+        // ==============================================
+        // AUDIO FUNCTIONS - FIXED
+        // ==============================================
+
+        function toggleMic() {
+            if (!appState.mediaStream) return;
+            
+            const audioTracks = appState.mediaStream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                appState.isMuted = !appState.isMuted;
+                audioTracks[0].enabled = !appState.isMuted;
+                
+                const micControl = document.getElementById('micControl');
+                if (appState.isMuted) {
+                    micControl.classList.add('muted');
+                    micControl.innerHTML = `
+                        <i class="fas fa-microphone-slash"></i>
+                        <span class="control-label">Microphone Muted</span>
+                        <span class="control-status">Click to unmute</span>
+                    `;
+                    
+                    simulatedServer.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🔇 Broadcaster muted microphone`,
+                        type: 'system'
+                    });
+                    
+                    showToast('Microphone muted', 'warning');
+                } else {
+                    micControl.classList.remove('muted');
+                    micControl.innerHTML = `
+                        <i class="fas fa-microphone"></i>
+                        <span class="control-label">Microphone</span>
+                        <span class="control-status">Click to mute</span>
+                    `;
+                    
+                    simulatedServer.addMessage({
+                        userId: 'system_001',
+                        username: 'System',
+                        role: 'system',
+                        content: `🎙️ Broadcaster unmuted microphone`,
+                        type: 'system'
+                    });
+                    
+                    showToast('Microphone unmuted', 'success');
+                }
+            }
+        }
+
+        function toggleAudio() {
+            const videoElement = document.getElementById('broadcastVideo');
+            appState.isAudioMuted = !appState.isAudioMuted;
+            videoElement.muted = appState.isAudioMuted;
+            
+            const audioControl = document.getElementById('audioControl');
+            if (appState.isAudioMuted) {
+                audioControl.innerHTML = `
+                    <i class="fas fa-volume-mute"></i>
+                    <span class="control-label">Audio Muted</span>
+                    <span class="control-status">Click to unmute</span>
+                `;
+                showToast('Audio muted', 'warning');
+            } else {
+                audioControl.innerHTML = `
+                    <i class="fas fa-volume-up"></i>
+                    <span class="control-label">Audio</span>
+                    <span class="control-status">Click to mute</span>
+                `;
+                showToast('Audio unmuted', 'success');
+            }
+        }
+
+        // ==============================================
+        // VOICE FEATURE FUNCTIONS - FIXED
+        // ==============================================
+
+        function toggleVoiceFeature() {
+            if (!appState.isBroadcaster) return;
+            
+            appState.voiceFeatureEnabled = !appState.voiceFeatureEnabled;
+            
+            const voiceFeatureBtn = document.getElementById('voiceFeatureBtn');
+            if (appState.voiceFeatureEnabled) {
+                voiceFeatureBtn.classList.add('active');
+                voiceFeatureBtn.innerHTML = `
+                    <i class="fas fa-microphone-alt"></i>
+                    <span class="control-label">Disable Voice</span>
+                    <span class="control-status">Viewers can speak live</span>
+                `;
+                
+                document.getElementById('voiceControls').style.display = 'block';
+                document.getElementById('voiceFeatureBadge').style.display = 'flex';
+                
+                simulatedServer.addMessage({
+                    userId: 'system_001',
+                    username: 'System',
+                    role: 'system',
+                    content: `🎤 Broadcaster enabled live voice communication`,
+                    type: 'system'
+                });
+                
+                showToast('Voice feature enabled. Viewers can now speak live.', 'voice');
+            } else {
+                voiceFeatureBtn.classList.remove('active');
+                voiceFeatureBtn.innerHTML = `
+                    <i class="fas fa-microphone-alt"></i>
+                    <span class="control-label">Enable Voice</span>
+                    <span class="control-status">Allow viewer voice</span>
+                `;
+                
+                document.getElementById('voiceControls').style.display = 'none';
+                document.getElementById('voiceFeatureBadge').style.display = 'none';
+                
+                simulatedServer.voiceParticipants = [];
+                appState.activeSpeakers = [];
+                
+                if (appState.isSpeaking) {
+                    stopViewerVoice();
+                }
+                
+                simulatedServer.addMessage({
+                    userId: 'system_001',
+                    username: 'System',
+                    role: 'system',
+                    content: `🔇 Broadcaster disabled live voice communication`,
+                    type: 'system'
+                });
+                
+                showToast('Voice feature disabled', 'warning');
+            }
+            
+            updateViewerVoiceUI();
+        }
+
+        function updateViewerVoiceUI() {
+            const viewerVoiceBtn = document.getElementById('viewerVoiceBtn');
+            const broadcaster = simulatedServer.getBroadcaster();
+            
+            if (!appState.isBroadcaster && broadcaster && appState.voiceFeatureEnabled) {
+                viewerVoiceBtn.style.display = 'flex';
+                
+                if (appState.isSpeaking) {
+                    viewerVoiceBtn.classList.add('voice-active');
+                    viewerVoiceBtn.classList.add('speaking');
+                    viewerVoiceBtn.innerHTML = `
+                        <i class="fas fa-microphone"></i>
+                        <span class="control-label">Stop Speaking</span>
+                        <span class="control-status">Click to stop</span>
+                    `;
+                } else {
+                    viewerVoiceBtn.classList.remove('voice-active');
+                    viewerVoiceBtn.classList.remove('speaking');
+                    viewerVoiceBtn.innerHTML = `
+                        <i class="fas fa-microphone"></i>
+                        <span class="control-label">Speak Live</span>
+                        <span class="control-status">Click to speak to broadcaster</span>
+                    `;
+                }
+            } else {
+                viewerVoiceBtn.style.display = 'none';
+            }
+        }
+
+        async function toggleViewerVoice() {
+            if (appState.isSpeaking) {
+                stopViewerVoice();
+            } else {
+                await startViewerVoice();
+            }
+        }
+
+        async function startViewerVoice() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        channelCount: 1
+                    }
+                });
+                
+                appState.viewerMediaStream = stream;
+                appState.isSpeaking = true;
+                
+                simulatedServer.addVoiceParticipant({
+                    id: appState.currentUser.id,
+                    username: appState.currentUser.username,
+                    isSpeaking: true
+                });
+                
+                simulatedServer.updateVoiceParticipantStatus(appState.currentUser.id, true);
+                
+                updateViewerVoiceUI();
+                
+                document.getElementById('voiceStatus').style.display = 'flex';
+                document.getElementById('currentSpeaker').textContent = `${appState.currentUser.username} is speaking`;
+                
+                simulatedServer.addMessage({
+                    userId: 'system_001',
+                    username: 'System',
+                    role: 'system',
+                    content: `🎤 ${appState.currentUser.username} started speaking`,
+                    type: 'system'
+                });
+                
+                showToast('You are now speaking live!', 'voice');
+                
+                setupVoiceVisualization(stream);
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showToast('Failed to access microphone. Please check permissions.', 'error');
+            }
+        }
+
+        function stopViewerVoice() {
+            if (appState.viewerMediaStream) {
+                appState.viewerMediaStream.getTracks().forEach(track => track.stop());
+                appState.viewerMediaStream = null;
+            }
+            
+            appState.isSpeaking = false;
+            
+            simulatedServer.updateVoiceParticipantStatus(appState.currentUser.id, false);
+            
+            setTimeout(() => {
+                simulatedServer.removeVoiceParticipant(appState.currentUser.id);
+            }, 2000);
+            
+            updateViewerVoiceUI();
+            
+            const activeSpeakers = simulatedServer.getVoiceParticipants().filter(p => p.isSpeaking);
+            if (activeSpeakers.length > 0) {
+                document.getElementById('currentSpeaker').textContent = `${activeSpeakers[0].username} is speaking`;
+            } else {
+                document.getElementById('voiceStatus').style.display = 'none';
+                document.getElementById('currentSpeaker').textContent = 'No active speaker';
+            }
+            
+            simulatedServer.addMessage({
+                userId: 'system_001',
+                username: 'System',
+                role: 'system',
+                content: `🔇 ${appState.currentUser.username} stopped speaking`,
+                type: 'system'
+            });
+            
+            showToast('You stopped speaking', 'info');
+        }
+
+        function setupVoiceVisualization(stream) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                
+                microphone.connect(analyser);
+                analyser.fftSize = 256;
+                
+                appState.viewerAudioContext = audioContext;
+                appState.viewerAnalyser = analyser;
+                appState.viewerMicrophone = microphone;
+            } catch (error) {
+                console.error('Error setting up voice visualization:', error);
+            }
+        }
+
+        function updateVoiceParticipants() {
+            const participants = simulatedServer.getVoiceParticipants();
+            const participantsList = document.getElementById('voiceParticipantsList');
+            const voiceControlsGrid = document.getElementById('voiceControlsGrid');
+            
+            if (participants.length === 0) {
+                participantsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-microphone-slash"></i>
+                        <h4>No active voice participants</h4>
+                        <p>When voice feature is enabled, participants will appear here</p>
+                    </div>
+                `;
+            } else {
+                participantsList.innerHTML = participants.map(participant => `
+                    <div class="user-item">
+                        <div class="user-main">
+                            <div class="user-avatar">${participant.username.charAt(0).toUpperCase()}</div>
+                            <div class="user-details">
+                                <div class="user-name">${participant.username} ${participant.id === appState.currentUser.id ? '(You)' : ''}</div>
+                                <div class="user-status ${participant.isSpeaking ? 'speaking' : 'online'}">
+                                    ${participant.isSpeaking ? 'Speaking Live' : 'Connected'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="voice-indicator ${participant.isSpeaking ? 'active' : ''}"></div>
+                    </div>
+                `).join('');
+            }
+            
+            if (appState.isBroadcaster && appState.voiceFeatureEnabled) {
+                if (participants.length === 0) {
+                    voiceControlsGrid.innerHTML = `
+                        <div class="empty-state" style="padding: 20px; grid-column: 1 / -1;">
+                            <i class="fas fa-microphone-slash"></i>
+                            <h4>No viewers speaking</h4>
+                            <p>Waiting for viewers to join voice chat...</p>
+                        </div>
+                    `;
+                } else {
+                    voiceControlsGrid.innerHTML = participants.map(participant => `
+                        <div class="voice-user-item">
+                            <div class="voice-user-info">
+                                <div class="voice-user-avatar">${participant.username.charAt(0).toUpperCase()}</div>
+                                <div>
+                                    <div class="voice-user-name">${participant.username}</div>
+                                    <div class="voice-user-status ${participant.isSpeaking ? 'speaking' : ''}">
+                                        ${participant.isSpeaking ? 'Speaking...' : 'Connected'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="voice-indicator ${participant.isSpeaking ? 'active' : ''}"></div>
+                        </div>
+                    `).join('');
+                }
+            }
+        }
+
+        function updateVoiceUI() {
+            const activeSpeakers = simulatedServer.getVoiceParticipants().filter(p => p.isSpeaking);
+            const voiceStatus = document.getElementById('voiceStatus');
+            const currentSpeaker = document.getElementById('currentSpeaker');
+            
+            if (activeSpeakers.length > 0) {
+                voiceStatus.style.display = 'flex';
+                if (activeSpeakers.length === 1) {
+                    currentSpeaker.textContent = `${activeSpeakers[0].username} is speaking`;
+                } else {
+                    currentSpeaker.textContent = `${activeSpeakers.length} people are speaking`;
+                }
+            } else {
+                voiceStatus.style.display = 'none';
+            }
+            
+            updateVoiceParticipants();
+        }
+
+        function showVoiceParticipantsModal() {
+            updateVoiceParticipants();
+            document.getElementById('voiceParticipantsModal').style.display = 'flex';
+        }
+
+        // ==============================================
+        // RECORDING FUNCTIONS - FIXED
+        // ==============================================
+
+        function toggleRecording() {
+            if (appState.isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            const videoElement = document.getElementById('broadcastVideo');
+            
+            if (!videoElement.srcObject && !appState.isBroadcaster) {
+                showToast('No broadcast to record', 'error');
+                return;
+            }
+            
+            try {
+                startRecordingCanvas();
+                
+                const canvasStream = recordingCanvas.captureStream(30);
+                
+                let audioTrack = null;
+                if (appState.mediaStream) {
+                    const audioTracks = appState.mediaStream.getAudioTracks();
+                    if (audioTracks.length > 0) {
+                        audioTrack = audioTracks[0];
+                    }
+                }
+                
+                const combinedStream = new MediaStream();
+                
+                const videoTracks = canvasStream.getVideoTracks();
+                if (videoTracks.length > 0) {
+                    combinedStream.addTrack(videoTracks[0]);
+                }
+                
+                if (audioTrack) {
+                    combinedStream.addTrack(audioTrack);
+                }
+                
+                if (!window.MediaRecorder) {
+                    showToast('Recording not supported in this browser', 'error');
+                    return;
+                }
+                
+                const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') 
+                    ? 'video/webm;codecs=vp9'
+                    : MediaRecorder.isTypeSupported('video/webm;codecs=vp8')
+                    ? 'video/webm;codecs=vp8'
+                    : 'video/webm';
+                
+                appState.mediaRecorder = new MediaRecorder(combinedStream, {
+                    mimeType: mimeType,
+                    videoBitsPerSecond: 2500000
+                });
+                
+                appState.recordedChunks = [];
+                
+                appState.mediaRecorder.ondataavailable = (event) => {
+                    if (event.data && event.data.size > 0) {
+                        appState.recordedChunks.push(event.data);
+                    }
+                };
+                
+                appState.mediaRecorder.onstop = () => {
+                    const blob = new Blob(appState.recordedChunks, {
+                        type: mimeType
+                    });
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    const username = appState.currentUser.username;
+                    const cameraInfo = appState.isBroadcaster ? `_${appState.currentCamera}_camera` : '';
+                    const screenInfo = appState.isSharingScreen ? '_screen' : '';
+                    const filename = `LiveCast_${username}${cameraInfo}${screenInfo}_${timestamp}.webm`;
+                    a.download = filename;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    
+                    URL.revokeObjectURL(url);
+                    appState.recordedChunks = [];
+                    
+                    stopRecordingCanvas();
+                    
+                    if (appState.recordingInterval) {
+                        clearInterval(appState.recordingInterval);
+                        appState.recordingInterval = null;
+                    }
+                    
+                    document.getElementById('recordingTimer').style.display = 'none';
+                    
+                    const duration = (Date.now() - appState.recordingStartTime) / 1000;
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60);
+                    showToast(`Recording downloaded (${minutes}:${seconds.toString().padStart(2, '0')})`, 'success');
+                };
+                
+                appState.mediaRecorder.onerror = (event) => {
+                    console.error('MediaRecorder error:', event);
+                    showToast('Recording error occurred', 'error');
+                    appState.isRecording = false;
+                    updateRecordingUI();
+                    stopRecordingCanvas();
+                };
+                
+                appState.mediaRecorder.start(1000);
+                appState.isRecording = true;
+                appState.recordingStartTime = Date.now();
+                
+                startRecordingTimer();
+                
+                updateRecordingUI();
+                showToast('Recording started', 'success');
+                
+            } catch (error) {
+                console.error('Error starting recording:', error);
+                showToast('Failed to start recording', 'error');
+                stopRecordingCanvas();
+            }
+        }
+
+        function stopRecording() {
+            if (!appState.isRecording || !appState.mediaRecorder) return;
+            
+            try {
+                appState.mediaRecorder.stop();
+                appState.isRecording = false;
+                appState.mediaRecorder = null;
+                
+                updateRecordingUI();
+                
+            } catch (error) {
+                console.error('Error stopping recording:', error);
+                showToast('Failed to stop recording', 'error');
+            }
+        }
+
+        function startRecordingCanvas() {
+            const videoElement = document.getElementById('broadcastVideo');
+            
+            function drawFrame() {
+                if (!appState.isRecording || !videoElement || videoElement.readyState !== 4) {
+                                        if (appState.isRecording) {
+                        appState.recordingAnimationId = requestAnimationFrame(drawFrame);
+                    }
+                    return;
+                }
+                
+                const videoWidth = videoElement.videoWidth || 640;
+                const videoHeight = videoElement.videoHeight || 480;
+                
+                if (videoWidth > 0 && videoHeight > 0) {
+                    recordingCanvas.width = videoWidth;
+                    recordingCanvas.height = videoHeight;
+                    
+                    // Clear canvas
+                    recordingCtx.clearRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+                    
+                    // Draw video frame with correct orientation
+                    if (appState.currentCamera === 'front' && !appState.isSharingScreen) {
+                        // Front camera: mirrored for natural selfie view
+                        recordingCtx.save();
+                        recordingCtx.translate(recordingCanvas.width, 0);
+                        recordingCtx.scale(-1, 1);
+                        recordingCtx.drawImage(videoElement, 0, 0, recordingCanvas.width, recordingCanvas.height);
+                        recordingCtx.restore();
+                    } else {
+                        // Back camera or screen share: natural orientation (no mirroring)
+                        recordingCtx.drawImage(videoElement, 0, 0, recordingCanvas.width, recordingCanvas.height);
+                    }
+                }
+                
+                if (appState.isRecording) {
+                    appState.recordingAnimationId = requestAnimationFrame(drawFrame);
+                }
+            }
+            
+            appState.recordingAnimationId = requestAnimationFrame(drawFrame);
+        }
+
+        function stopRecordingCanvas() {
+            if (appState.recordingAnimationId) {
+                cancelAnimationFrame(appState.recordingAnimationId);
+                appState.recordingAnimationId = null;
+            }
+        }
+
+        function startRecordingTimer() {
+            document.getElementById('recordingTimer').style.display = 'flex';
+            
+            appState.recordingInterval = setInterval(() => {
+                if (appState.isRecording && appState.recordingStartTime) {
+                    const elapsed = Date.now() - appState.recordingStartTime;
+                    const minutes = Math.floor(elapsed / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    document.getElementById('recordingTime').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+            }, 1000);
+        }
+
+        function updateRecordingUI() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordingBadge = document.getElementById('recordingBadge');
+            
+            if (appState.isRecording) {
+                recordBtn.classList.add('recording-active');
+                recordBtn.classList.add('recording');
+                recordBtn.innerHTML = `
+                    <i class="fas fa-circle"></i>
+                    <span class="control-label">Recording...</span>
+                    <span class="control-status">Click to stop and download</span>
+                `;
+                recordingBadge.style.display = 'flex';
+            } else {
+                recordBtn.classList.remove('recording-active');
+                recordBtn.classList.remove('recording');
+                recordBtn.innerHTML = `
+                    <i class="fas fa-circle"></i>
+                    <span class="control-label">Record</span>
+                    <span class="control-status">Click to start recording</span>
+                `;
+                recordingBadge.style.display = 'none';
+            }
+        }
+
+        // ==============================================
+        // CHAT FUNCTIONS
+        // ==============================================
+
+        function sendChatMessage(e) {
+            e.preventDefault();
+            
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            simulatedServer.setUserTyping(appState.currentUser.id, false);
+            
+            const chatMessage = {
+                userId: appState.currentUser.id,
+                username: appState.currentUser.username,
+                role: appState.isBroadcaster ? 'broadcaster' : 'viewer',
+                content: message,
+                type: 'chat'
+            };
+            
+            simulatedServer.addMessage(chatMessage);
+            input.value = '';
+            input.focus();
+        }
+
+        function updateChatMessages() {
+            const messages = simulatedServer.getMessages();
+            const chatMessagesContainer = document.getElementById('chatMessages');
+            
+            if (messages.length === appState.chatMessages.length) {
+                let same = true;
+                for (let i = 0; i < messages.length; i++) {
+                    if (messages[i].id !== appState.chatMessages[i]?.id) {
+                        same = false;
+                        break;
+                    }
+                }
+                if (same) return;
+            }
+            
+            appState.chatMessages = [...messages];
+            chatMessagesContainer.innerHTML = '';
+            
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${msg.role === 'broadcaster' ? 'broadcaster' : ''} ${msg.type === 'system' ? 'system' : ''} ${msg.type === 'voice' ? 'voice' : ''} ${msg.type === 'screen-share' ? 'screen-share' : ''}`;
+                
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                messageElement.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-user">
+                            <span>${msg.username}</span>
+                            ${msg.role !== 'system' ? `<span class="message-role ${msg.role === 'broadcaster' ? 'broadcaster-tag' : msg.type === 'voice' ? 'voice-tag' : msg.type === 'screen-share' ? 'screen-share-tag' : 'viewer-tag'}">${msg.role}</span>` : ''}
+                        </div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                    <div class="message-content">${msg.content}</div>
+                `;
+                
+                chatMessagesContainer.appendChild(messageElement);
+            });
+            
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+
+        function updateTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            const typingUsers = Array.from(appState.typingUsers);
+            
+            if (typingUsers.length > 0 && appState.currentUser) {
+                const otherTypingUsers = typingUsers
+                    .filter(id => id !== appState.currentUser.id)
+                    .map(id => {
+                        const user = simulatedServer.users.find(u => u.id === id);
+                        return user ? user.username : 'Someone';
+                    });
+                
+                if (otherTypingUsers.length > 0) {
+                    const text = otherTypingUsers.length === 1 
+                        ? `${otherTypingUsers[0]} is typing...`
+                        : `${otherTypingUsers.length} people are typing...`;
+                    
+                    if (!typingIndicator) {
+                        const indicator = document.createElement('div');
+                        indicator.id = 'typingIndicator';
+                        indicator.className = 'message system';
+                        indicator.innerHTML = `
+                            <div class="message-content">
+                                <i class="fas fa-pencil-alt"></i> ${text}
+                            </div>
+                        `;
+                        document.getElementById('chatMessages').appendChild(indicator);
+                    } else {
+                        typingIndicator.querySelector('.message-content').innerHTML = `
+                            <i class="fas fa-pencil-alt"></i> ${text}
+                        `;
+                    }
+                } else if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            } else if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            
+            if (typingUsers.length > 0) {
+                const chatMessagesContainer = document.getElementById('chatMessages');
+                chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            }
+        }
+
+        // ==============================================
+        // USER MANAGEMENT FUNCTIONS
+        // ==============================================
+
+        function updateOnlineUsers() {
+            const users = simulatedServer.getUsers();
+            const broadcaster = simulatedServer.getBroadcaster();
+            
+            const onlineCount = users.filter(u => u.online && u.id !== 'system_001').length + (broadcaster ? 1 : 0);
+            document.getElementById('onlineCount').textContent = `${onlineCount} online`;
+        }
+
+        function showUsersModal() {
+            updateUsersModal();
+            document.getElementById('usersModal').style.display = 'flex';
+        }
+
+        function updateUsersModal() {
+            const usersList = document.getElementById('usersList');
+            const broadcaster = simulatedServer.getBroadcaster();
+            const users = simulatedServer.getUsers();
+            
+            let html = '';
+            
+            if (broadcaster) {
+                html += `
+                    <div class="user-item">
+                        <div class="user-main">
+                            <div class="user-avatar">${broadcaster.username.charAt(0).toUpperCase()}</div>
+                            <div class="user-details">
+                                <div class="user-name">${broadcaster.username} ${broadcaster.id === appState.currentUser.id ? '(You)' : ''}</div>
+                                <div class="user-status online">Online • Live</div>
+                            </div>
+                        </div>
+                        <div class="user-role broadcaster-role">Broadcaster</div>
+                    </div>
+                `;
+            }
+            
+            users.forEach(user => {
+                if (user.id === 'system_001') return;
+                if (user.id === appState.currentUser.id && broadcaster && broadcaster.id === appState.currentUser.id) return;
+                
+                const isCurrentUser = user.id === appState.currentUser.id;
+                const isOnline = user.online;
+                
+                html += `
+                    <div class="user-item">
+                        <div class="user-main">
+                            <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
+                            <div class="user-details">
+                                <div class="user-name">${user.username} ${isCurrentUser ? '(You)' : ''}</div>
+                                <div class="user-status ${isOnline ? 'online' : ''}">
+                                    ${isOnline ? 'Online' : 'Offline'}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="user-role viewer-role">Viewer</div>
+                    </div>
+                `;
+            });
+            
+            usersList.innerHTML = html || `
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <h4>No other users online</h4>
+                    <p>Invite others to join the broadcast</p>
+                </div>
+            `;
+        }
+
+        function showRecordingsModal() {
+            updateRecordingsModal();
+            document.getElementById('recordingsModal').style.display = 'flex';
+        }
+
+        function updateRecordingsModal() {
+            const recordingsList = document.getElementById('recordingsList');
+            
+            if (appState.recordings.length === 0) {
+                recordingsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-video"></i>
+                        <h4>No recordings yet</h4>
+                        <p>Start recording a broadcast to save videos locally. Recordings are automatically downloaded when you stop recording.</p>
+                    </div>
+                `;
+            } else {
+                recordingsList.innerHTML = appState.recordings.map((recording, index) => `
+                    <div class="recording-item">
+                        <div class="recording-info">
+                            <div class="recording-name">${recording.name}</div>
+                            <div class="recording-details">
+                                <span><i class="fas fa-calendar"></i> ${new Date(recording.date).toLocaleDateString()}</span>
+                                <span><i class="fas fa-clock"></i> ${recording.duration}</span>
+                                <span><i class="fas fa-file"></i> ${recording.size}</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline" style="padding: 8px 16px; font-size: 13px;">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // ==============================================
+        // CONNECTION & QUALITY FUNCTIONS
+        // ==============================================
+
+        function updateConnectionStatus(connected) {
+            const connectionStatus = document.getElementById('connectionStatus');
+            const connectionStatusText = document.getElementById('connectionStatusText');
+            const connectionDot = connectionStatus.querySelector('.connection-dot');
+            
+            if (connected) {
+                connectionStatus.style.display = 'flex';
+                connectionStatusText.textContent = 'Connected';
+                connectionDot.classList.remove('disconnected');
+                connectionDot.style.backgroundColor = 'var(--success)';
+            } else {
+                connectionStatus.style.display = 'flex';
+                connectionStatusText.textContent = 'Disconnected';
+                connectionDot.classList.add('disconnected');
+                connectionDot.style.backgroundColor = 'var(--danger)';
+            }
+        }
+
+        function updateConnectionQuality() {
+            const qualityIndicator = document.getElementById('qualityIndicator');
+            const qualityDot = qualityIndicator.querySelector('.quality-dot');
+            const qualityText = qualityIndicator.querySelector('span');
+            
+            qualityIndicator.style.display = 'block';
+            qualityDot.className = `quality-dot ${appState.connectionQuality}`;
+            
+            switch (appState.connectionQuality) {
+                case 'good':
+                    qualityText.textContent = 'Connection: Good';
+                    break;
+                case 'fair':
+                    qualityText.textContent = 'Connection: Fair';
+                    break;
+                case 'poor':
+                    qualityText.textContent = 'Connection: Poor';
+                    break;
+            }
+        }
+
+        // ==============================================
+        // UI HELPER FUNCTIONS
+        // ==============================================
+
+        function showAlert(elementId, message, type) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.textContent = message;
+            alertElement.className = `alert alert-${type}`;
+            alertElement.style.display = 'block';
+            
+            setTimeout(() => {
+                alertElement.style.display = 'none';
+            }, 5000);
+        }
+
+        function showToast(message, type = 'info') {
+            const toastId = 'toast_' + Date.now();
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `toast toast-${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle',
+                voice: 'fas fa-microphone',
+                screen: 'fas fa-desktop'
+            };
+            
+            toast.innerHTML = `
+                <i class="${icons[type]}"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="document.getElementById('${toastId}').remove()">&times;</button>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            setTimeout(() => {
+                if (document.getElementById(toastId)) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        function showLoader(text, subtext = '') {
+            document.getElementById('loaderText').textContent = text;
+            if (subtext) {
+                document.getElementById('loaderSubtext').textContent = subtext;
+                document.getElementById('loaderSubtext').style.display = 'block';
+            } else {
+                document.getElementById('loaderSubtext').style.display = 'none';
+            }
+            document.getElementById('loader').style.display = 'flex';
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        // ==============================================
+        // PERIODIC UPDATES
+        // ==============================================
+
+        function startPeriodicUpdates() {
+            setInterval(() => {
+                updateChatMessages();
+            }, 1000);
+            
+            setInterval(() => {
+                updateVoiceUI();
+            }, 2000);
+            
+            setInterval(() => {
+                updateOnlineUsers();
+            }, 5000);
+            
+            setInterval(() => {
+                updateConnectionQuality();
+            }, 10000);
+        }
+
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('LiveCast Pro - Initializing...');
+            
+            initAuth();
+            
+            const savedTheme = localStorage.getItem('livecast_theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            const darkModeIcon = document.querySelector('#darkModeToggle i');
+            if (darkModeIcon) {
+                darkModeIcon.className = savedTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+            
+            window.addEventListener('beforeunload', function(e) {
+                if (appState.isRecording) {
+                    stopRecording();
+                }
+                if (appState.isSpeaking) {
+                    stopViewerVoice();
+                }
+                if (appState.isSharingScreen) {
+                    stopScreenShare();
+                }
+                stopRecordingCanvas();
+                
+                if (appState.currentUser) {
+                    simulatedServer.removeUser(appState.currentUser.id);
+                }
+            });
+            
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    if (appState.isSpeaking) {
+                        stopViewerVoice();
+                        showToast('Voice stopped due to page visibility', 'warning');
+                    }
+                }
+            });
+            
+            setTimeout(() => {
+                if (simulatedServer.messages.length <= 1) {
+                    simulatedServer.addMessage({
+                        userId: 'demo_1',
+                        username: 'Alex_Streamer',
+                        role: 'broadcaster',
+                        content: 'Welcome everyone! Feel free to ask questions in the chat.',
+                        type: 'chat'
+                    });
+                    
+                    simulatedServer.addMessage({
+                        userId: 'demo_2',
+                        username: 'Sarah_Viewer',
+                        role: 'viewer',
+                        content: 'Great stream! How do I enable voice chat?',
+                        type: 'chat'
+                    });
+                    
+                    simulatedServer.addMessage({
+                        userId: 'demo_1',
+                        username: 'Alex_Streamer',
+                        role: 'broadcaster',
+                        content: 'Click the "Enable Voice" button below the video!',
+                        type: 'chat'
+                    });
+                }
+            }, 2000);
+            
+            console.log('LiveCast Pro - Initialization complete!');
+        });
+    </script>
+</body>
+</html>
